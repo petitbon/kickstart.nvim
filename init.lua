@@ -165,15 +165,6 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
-    main = 'ibl',
-    opts = {},
-  },
-
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -650,8 +641,9 @@ require("nvim-tree").setup({
 
 
 vim.cmd [[colorscheme tokyonight-night]]
-vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
+--vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+--vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]]
 
 
 
