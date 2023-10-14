@@ -150,14 +150,6 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
 
   {
     -- Set lualine as statusline
@@ -215,6 +207,25 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+  {
+    "nvim-tree/nvim-tree.lua",
+    version = "*",
+    lazy = false,
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("nvim-tree").setup {}
+    end,
+  },
+  {
+    "petitbon/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {},
+  },
+
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -228,7 +239,15 @@ require('lazy').setup({
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   -- { import = 'custom.plugins' },
+
+
+
+
 }, {})
+
+
+
+
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -326,6 +345,13 @@ vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { de
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
+
+
+vim.keymap.set('n', '<leader>d', ':NvimTreeToggle<CR>', {
+  noremap = true
+})
+
+
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -559,6 +585,79 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+
+require("tokyonight").setup({
+  style = "moon",
+  light_style = "day",
+  transparent = true,
+  terminal_colors = true,
+  styles = {
+    comments = { italic = false },
+    keywords = { italic = false },
+    functions = {},
+    variables = {},
+    sidebars = "transparent",
+    floats = "transparent",
+  },
+  sidebars = { "qf", "help" },
+  day_brightness = 1,
+  dim_inactive = false,
+  lualine_bold = false,
+  on_colors = function(colors) end,
+  on_highlights = function(highlights, colors) end,
+})
+
+require("nvim-tree").setup({
+  sort_by = "case_sensitive",
+  view = {
+    width = 60,
+  },
+  git = {
+    enable = true,
+    ignore = false,
+    timeout = 500,
+  },
+  filters = {
+    dotfiles = false,
+  },
+  renderer = {
+    icons = {
+      show = {
+        git = true,
+        file = false,
+        folder = false,
+        folder_arrow = true,
+      },
+      glyphs = {
+        folder = {
+          arrow_closed = "⏵",
+          arrow_open = "⏷",
+        },
+        git = {
+          unstaged = "✗",
+          staged = "✓",
+          unmerged = "⌥",
+          renamed = "➜",
+          untracked = "★",
+          deleted = "⊖",
+          ignored = "◌",
+        },
+      },
+    },
+  },
+})
+
+
+
+
+
+
+
+
+
+
+
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
