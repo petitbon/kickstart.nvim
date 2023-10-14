@@ -158,7 +158,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'onedark',
+        theme = 'tokyonight',
         component_separators = '|',
         section_separators = '',
       },
@@ -244,9 +244,6 @@ require('lazy').setup({
 
 
 }, {})
-
-
-
 
 
 -- [[ Setting options ]]
@@ -652,6 +649,8 @@ require("nvim-tree").setup({
 
 
 
+vim.cmd [[colorscheme tokyonight-night]]
+vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
 
 
