@@ -347,7 +347,7 @@ vim.keymap.set('n', '<leader>d', ':NvimTreeToggle<CR>', {
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = {'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -490,9 +490,8 @@ local servers = {
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
+  tsserver = {},
+  html = { filetypes = { 'html', 'twig', 'hbs'} },
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -533,6 +532,15 @@ local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
 
+vim.lsp.handlers["textDocument/publishDiagnostics"] =
+  vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics,
+  {
+    underline = false
+  }
+)
+
+
 cmp.setup {
   snippet = {
     expand = function(args)
@@ -572,6 +580,17 @@ cmp.setup {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
   },
+  revision = 0,
+  enabled = true,
+  performance = cmp.PerformanceConfig,
+  preselect = 'None',
+  completion = cmp.CompletionConfig,
+  confirmation = cmp.CompletionConfig,
+  matching = cmp.CompletionConfig,
+  sorting = cmp.CompletionConfig,
+  formatting= cmp.CompletionConfig,
+  view = cmp.ViewConfig,
+  experimental = cmp.ExperimentalConfig,
 }
 
 
