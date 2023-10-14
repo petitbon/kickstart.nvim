@@ -150,7 +150,6 @@ require('lazy').setup({
     },
   },
 
-
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
@@ -216,8 +215,9 @@ require('lazy').setup({
     opts = {},
   },
 
+  'jose-elias-alvarez/null-ls.nvim',
 
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
+-- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
   -- require 'kickstart.plugins.autoformat',
@@ -232,10 +232,7 @@ require('lazy').setup({
   -- { import = 'custom.plugins' },
 
 
-
-
 }, {})
-
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -269,7 +266,7 @@ vim.o.smartcase = true
 vim.wo.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 250
+    vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
@@ -418,13 +415,27 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
-  -- NOTE: Remember that lua is a real programming language, and as such it is possible
-  -- to define small helper and utility functions so you don't have to repeat yourself
-  -- many times.
-  --
-  -- In this case, we create a function that lets us more easily define mappings specific
-  -- for LSP related items. It sets the mode, buffer and description for us each time.
+
+
+--function(client, buffer)
+
+
+local null_ls = require('null-ls') 
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+local lsp_formatting = function(buffer)
+  vim.lsp.buf.format({
+    filter = function(client)
+      -- By default, ignore any formatters provider by other LSPs 
+      -- (such as those managed via lspconfig or mason)
+      -- Also "eslint as a formatter" doesn't work :(
+      return client.name == "null-ls"
+    end,
+    bufnr = buffer,
+  })
+end
+
+local on_attach = function(client, bufnr)
   local nmap = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
@@ -459,6 +470,27 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
+
+
+-- Format on save
+-- https://github.com/jose-elias-alvarez/null-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts#neovim-08
+  -- the Buffer will be null in buffers like nvim-tree or new unsaved files
+  if (not bufnr) then
+    return
+  end
+
+  if client.supports_method("textDocument/formatting") then
+    vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = augroup,
+      buffer = bufnr,
+      callback = function()
+        lsp_formatting(bufnr)
+      end,
+    })
+  end
+
+
 end
 
 -- document existing key chains
@@ -531,14 +563,6 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
 luasnip.config.setup {}
-
-vim.lsp.handlers["textDocument/publishDiagnostics"] =
-  vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics,
-  {
-    underline = false
-  }
-)
 
 
 cmp.setup {
@@ -656,14 +680,43 @@ require("nvim-tree").setup({
 })
 
 
-
-
-
 vim.cmd [[colorscheme tokyonight-night]]
 
---vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
---vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]]
+vim.lsp.handlers["textDocument/publishDiagnostics"] =
+  vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics,
+  {
+    underline = false
+  }
+)
 
+null_ls.setup({
+  sources = {
+    null_ls.builtins.formatting.prettierd.with({
+      filetypes = {
+        "css", "json", "jsonc","javascript", "typescript",
+        "javascript.glimmer", "typescript.glimmer",
+        "handlebars"
+      }
+    }),
+
+    null_ls.builtins.code_actions.gitsigns,
+    null_ls.builtins.completion.luasnip,
+
+  },
+  on_attach = on_attach
+})
+
+local eslint = require('lspconfig').eslint
+
+eslint.setup({
+  on_attach = function(_, bufnr)
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      command = "EslintFixAll",
+    })
+  end,
+})
 
 
 
