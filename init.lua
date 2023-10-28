@@ -522,7 +522,7 @@ local servers = {
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
-  tsserver = {},
+  tsserver = {filetypes = {'javascriptreact'}},
   html = { filetypes = { 'html', 'twig', 'hbs'} },
   lua_ls = {
     Lua = {
@@ -694,7 +694,7 @@ null_ls.setup({
   sources = {
     null_ls.builtins.formatting.prettierd.with({
       filetypes = {
-        "css", "json", "jsonc","javascript", "typescript",
+        "css", "json", "jsonc","javascript", "typescript", "javascriptreact",
         "javascript.glimmer", "typescript.glimmer",
         "handlebars"
       }
