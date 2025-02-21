@@ -1,45 +1,7 @@
 --[[
 
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-
-Kickstart.nvim is *not* a distribution.
-
 Kickstart.nvim is a template for your own configuration.
-  The goal is that you can read every line of code, top-to-bottom, understand
-  what your configuration is doing, and modify it to suit your needs.
-
-  Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
-
-  If you don't know anything about Lua, I recommend taking some time to read through
-  a guide. One possible example:
-  - https://learnxinyminutes.com/docs/lua/
-
-
-  And then you can explore or search through `:help lua-guide`
-  - https://neovim.io/doc/user/lua-guide.html
-
-
-Kickstart Guide:
-
-I have left several `:help X` comments throughout the init.lua
-You should run that command and read that help section for more information.
-
-In addition, I have some `NOTE:` items throughout the file.
-These are for you, the reader to help understand what is happening. Feel free to delete
-them once you know what you're doing, but they should serve as a guide for when you
-are first encountering a few different constructs in your nvim config.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now :)
 --]]
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ','
 vim.g.maplocalleader = ','
 
@@ -82,6 +44,7 @@ require('lazy').setup({
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
       'williamboman/mason.nvim',
+
       'williamboman/mason-lspconfig.nvim',
 
       -- Useful status updates for LSP
@@ -110,7 +73,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -217,7 +180,7 @@ require('lazy').setup({
 
   'jose-elias-alvarez/null-ls.nvim',
 
--- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
+  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
   -- require 'kickstart.plugins.autoformat',
@@ -266,7 +229,7 @@ vim.o.smartcase = true
 vim.wo.signcolumn = 'yes'
 
 -- Decrease update time
-    vim.o.updatetime = 250
+vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 
 -- Set completeopt to have a better completion experience
@@ -343,10 +306,9 @@ vim.keymap.set('n', '<leader>d', ':NvimTreeToggle<CR>', {
 -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
-    -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = {'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = { 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'jsx', 'javascriptreact', 'typescript',
+      'vimdoc', 'vim', 'bash' },
 
-    -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
 
     highlight = { enable = true },
@@ -415,27 +377,13 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
-
-
---function(client, buffer)
-
-
-local null_ls = require('null-ls') 
-local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-
-local lsp_formatting = function(buffer)
-  vim.lsp.buf.format({
-    filter = function(client)
-      -- By default, ignore any formatters provider by other LSPs 
-      -- (such as those managed via lspconfig or mason)
-      -- Also "eslint as a formatter" doesn't work :(
-      return client.name == "null-ls"
-    end,
-    bufnr = buffer,
-  })
-end
-
-local on_attach = function(client, bufnr)
+local on_attach = function(_, bufnr)
+  -- NOTE: Remember that lua is a real programming language, and as such it is possible
+  -- to define small helper and utility functions so you don't have to repeat yourself
+  -- many times.
+  --
+  -- In this case, we create a function that lets us more easily define mappings specific
+  -- for LSP related items. It sets the mode, buffer and description for us each time.
   local nmap = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
@@ -470,27 +418,6 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
-
-
--- Format on save
--- https://github.com/jose-elias-alvarez/null-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts#neovim-08
-  -- the Buffer will be null in buffers like nvim-tree or new unsaved files
-  if (not bufnr) then
-    return
-  end
-
-  if client.supports_method("textDocument/formatting") then
-    vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      group = augroup,
-      buffer = bufnr,
-      callback = function()
-        lsp_formatting(bufnr)
-      end,
-    })
-  end
-
-
 end
 
 -- document existing key chains
@@ -522,8 +449,8 @@ local servers = {
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
-  tsserver = {filetypes = {'javascriptreact'}},
-  html = { filetypes = { 'html', 'twig', 'hbs'} },
+  tsserver = {},
+  html = { filetypes = { 'html', 'twig', 'hbs' } },
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -612,7 +539,7 @@ cmp.setup {
   confirmation = cmp.CompletionConfig,
   matching = cmp.CompletionConfig,
   sorting = cmp.CompletionConfig,
-  formatting= cmp.CompletionConfig,
+  formatting = cmp.CompletionConfig,
   view = cmp.ViewConfig,
   experimental = cmp.ExperimentalConfig,
 }
@@ -683,20 +610,60 @@ require("nvim-tree").setup({
 vim.cmd [[colorscheme tokyonight-night]]
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] =
-  vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics,
-  {
-    underline = false
-  }
-)
+    vim.lsp.with(
+      vim.lsp.diagnostic.on_publish_diagnostics,
+      {
+        underline = false
+      }
+    )
+
+
+
+
+local null_ls = require('null-ls')
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+-- TODO: figure out how to wire up ember-template-lint
+local lsp_formatting = function(buffer)
+  vim.lsp.buf.format({
+    filter = function(client)
+      -- By default, ignore any formatters provider by other LSPs
+      -- (such as those managed via lspconfig or mason)
+      -- Also "eslint as a formatter" doesn't work :(
+      return client.name == "null-ls"
+    end,
+    bufnr = buffer,
+  })
+end
+
+-- Format on save
+-- https://github.com/jose-elias-alvarez/null-ls.nvim/wiki/Avoiding-LSP-formatting-conflicts#neovim-08
+local on_attach = function(client, buffer)
+  -- the Buffer will be null in buffers like nvim-tree or new unsaved files
+  if (not buffer) then
+    return
+  end
+
+  if client.supports_method("textDocument/formatting") then
+    vim.api.nvim_clear_autocmds({ group = augroup, buffer = buffer })
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = augroup,
+      buffer = buffer,
+      callback = function()
+        lsp_formatting(buffer)
+      end,
+    })
+  end
+end
 
 null_ls.setup({
   sources = {
     null_ls.builtins.formatting.prettierd.with({
+
       filetypes = {
-        "css", "json", "jsonc","javascript", "typescript", "javascriptreact",
+        "css", "json", "jsonc", "javascript", "typescript", "lua",
         "javascript.glimmer", "typescript.glimmer",
-        "handlebars"
+        "handlebars", "javascriptreact", "typescriptreact"
       }
     }),
 
@@ -707,10 +674,13 @@ null_ls.setup({
   on_attach = on_attach
 })
 
+
+
+
 local eslint = require('lspconfig').eslint
 
 eslint.setup({
-  on_attach = function(_, bufnr)
+  on_attach = function(client, bufnr)
     vim.api.nvim_create_autocmd("BufWritePre", {
       buffer = bufnr,
       command = "EslintFixAll",
