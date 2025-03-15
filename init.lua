@@ -56,6 +56,9 @@ Kickstart Guide:
   Once you've completed that, you can continue working through **AND READING** the rest
   of the kickstart init.lua.
 
+
+
+
   Next, run AND READ `:help`.
     This will open up a help window with some basic information
     about reading, navigating and searching the builtin help documentation.
@@ -160,6 +163,10 @@ vim.opt.scrolloff = 10
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.opt.confirm = true
+
+vim.opt.termguicolors = true
+
+vim.cmd [[ set termguicolors ]]
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -286,6 +293,13 @@ require('lazy').setup({
     config = function()
       require('nvim-tree').setup {}
     end,
+  },
+
+  {
+    'petitbon/tokyonight.nvim',
+    lazy = false,
+    priority = 1000,
+    opts = {},
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -918,28 +932,6 @@ require('lazy').setup({
     end,
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'petitbon/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
-    end,
-  },
-
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -1053,6 +1045,69 @@ require('lazy').setup({
     },
   },
 })
+
+require('tokyonight').setup {
+  style = 'moon',
+  light_style = 'day',
+  transparent = true,
+  terminal_colors = true,
+  styles = {
+    comments = { italic = false },
+    keywords = { italic = false },
+    functions = {},
+    variables = {},
+    sidebars = 'transparent',
+    floats = 'transparent',
+  },
+  sidebars = { 'qf', 'help' },
+  day_brightness = 1,
+  dim_inactive = false,
+  lualine_bold = false,
+  on_colors = function(colors) end,
+  on_highlights = function(highlights, colors) end,
+}
+
+require('nvim-tree').setup {
+  sort_by = 'case_sensitive',
+  view = {
+    width = 60,
+  },
+  git = {
+    enable = true,
+    ignore = false,
+    timeout = 500,
+  },
+  filters = {
+    dotfiles = false,
+  },
+  renderer = {
+    icons = {
+      show = {
+        git = true,
+        file = false,
+        folder = false,
+        folder_arrow = true,
+      },
+      glyphs = {
+        folder = {
+          arrow_closed = '⏵',
+          arrow_open = '⏷',
+        },
+        git = {
+          unstaged = '✗',
+          staged = '✓',
+          unmerged = '⌥',
+          renamed = '➜',
+          untracked = '★',
+          deleted = '⊖',
+          ignored = '◌',
+        },
+      },
+    },
+  },
+}
+
+vim.cmd [[colorscheme tokyonight-night]]
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
