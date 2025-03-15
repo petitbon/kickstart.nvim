@@ -205,6 +205,8 @@ vim.keymap.set('n', '<leader>d', ':NvimTreeToggle<CR>', {
   noremap = true,
 })
 
+vim.keymap.set('n', '<leader>ey', '<cmd>lua vim.diagnostic.open_float()<CR><cmd>lua vim.diagnostic.open_float()<CR>ggVG"+Y<CR>')
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
