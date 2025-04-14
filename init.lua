@@ -221,7 +221,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
-vim.keymap.set('n', '<leader>ff', [[:%s@//.*@@g | %s@/\*\_.\{-}\*/@@g | %s/\n\(\s*\n\)\{2,}/\n\n/g<CR>]], { silent = true })
+vim.keymap.set('n', '<leader>ll', [[:%s/\(\n\s*\n\s*\)\+/\r\r/g<CR>]], { silent = true })
+vim.keymap.set('n', '<leader>cc', [[:%s@//.*@@g | %s@/\*\_.\{-}\*/@@g<CR>]], { silent = true })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
