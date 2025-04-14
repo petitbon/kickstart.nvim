@@ -221,6 +221,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.keymap.set('n', '<leader>ff', [[:%s@//.*@@g | %s@/\*\_.\{-}\*/@@g | %s/\n\(\s*\n\)\{2,}/\n\n/g<CR>]], { silent = true })
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -932,6 +934,17 @@ require('lazy').setup({
         },
       }
     end,
+  },
+
+  {
+    'joshuavial/aider.nvim',
+    opts = {
+      -- your configuration comes here
+      -- if you don't want to use the default settings
+      auto_manage_context = true, -- automatically manage buffer context
+      default_bindings = true, -- use default <leader>A keybindings
+      debug = false, -- enable debug logging
+    },
   },
 
   -- Highlight todo, notes, etc in comments
