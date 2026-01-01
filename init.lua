@@ -1101,6 +1101,8 @@ require('nvim-tree').setup {
     enable = true,
     ignore = false,
     timeout = 500,
+    show_on_dirs = true,
+    show_on_open_dirs = true,
   },
   filters = {
     dotfiles = false,
@@ -1119,7 +1121,7 @@ require('nvim-tree').setup {
           arrow_open = '⏷',
         },
         git = {
-          unstaged = '✗',
+          unstaged = 'x',
           staged = '✓',
           unmerged = '⌥',
           renamed = '➜',
